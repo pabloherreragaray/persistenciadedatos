@@ -17,7 +17,7 @@ La clase server.Servidor hace uso de "socketserver" para abrir un hilo de ejecuc
 
 La petición en formato JSON debe contener este formato:
 
-```json
+```javascript
 {
   "operacion": "", //Es una cadena con el nombre de la función que debe ejecutar el controlador.
   "datos": {} //Es un objeto con los datos que se desea procesar.
@@ -26,7 +26,7 @@ La petición en formato JSON debe contener este formato:
 
 El resultado del procesamiento es entregado por el servidor en el siguiente formato JSON:
 
-```json
+```javascript
 {
   "datos": {}, //Es un objeto con la respuesta devuelta por el controlador.
   "error": "" //Es una cadena con el mensaje de error, de haberlo. En otro caso es null.
