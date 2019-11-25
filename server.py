@@ -30,7 +30,7 @@ class ServidorHandler(socketserver.BaseRequestHandler):
                 try:
                     controlador.procesar_peticion(pet,resp)
                 except Exception as e:
-                    error = 'Error al procesar la peticion: %s'%str(e)
+                    error = str(e)
                     resp.set_error(error)
                     log.error(error)
             self.request.sendall(bytes(resp.a_json(),'utf-8'))

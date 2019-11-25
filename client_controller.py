@@ -24,6 +24,11 @@ class ControladorCliente:
         pet = peticion.Peticion('consulta',{'cuenta':cuenta})
         resp = self.cliente.enviar_peticion(pet)
         return resp
+    
+    def consulta_cliente(self,cuenta,contrasena):
+        pet = peticion.Peticion('consulta_cliente',{'cuenta':cuenta,'contrasena':contrasena})
+        resp = self.cliente.enviar_peticion(pet)
+        return resp
 
 
 if __name__=='__main__':

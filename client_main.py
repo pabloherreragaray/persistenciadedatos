@@ -1,14 +1,19 @@
 import sys
+import client_controller
 
 class AplicacionConsola:
     ESTADO_SALIR_DEL_PROGRAMA = 'salir'
     ESTADO_INICIO = 'inicio'
     ESTADO_MENU_PRINCIPAL = 'menu_principal'
     ESTADO_CONSULTA = 'consulta'
+    ESTADO_RETIRO = 'retiro'
+    ESTADO_ABONO = 'abono'
 
     numero_cuenta = 0
+    nombre_cliente = ''
 
     def __init__(self):
+        self.controlador = client_controller.ControladorCliente()
         self.cambiar_estado(self.ESTADO_INICIO)
 
     def cambiar_estado(self,estado):
@@ -19,9 +24,85 @@ class AplicacionConsola:
             self.consultar()
         elif estado==self.ESTADO_INICIO:
             self.inicio()
+        elif estado==self.ESTADO_ABONO:
+            self.abono()
+        elif estado==self.ESTADO_RETIRO:
+            self.retiro()
     
     def consultar(self):
         self.mostrar_encabezado_principal('Consultar')
+        try:
+            resp = self.controlador.consulta(self.numero_cuenta)
+            print('Su saldo es: $%s'%resp.datos)
+        except:
+            self.mostrar_error_conexion()
+        print('')
+        print('(1) para regresar al menu, (2) para salir')
+        val = input()
+        if val=='2':
+            self.salir_del_programa()
+        else:
+            self.cambiar_estado(self.ESTADO_MENU_PRINCIPAL)
+    
+    def retiro(self):
+        self.mostrar_encabezado_principal('Retiro')
+        valor_monto = 0
+        while True:
+            print('Ingrese monto a retirar (0 para regresar)')
+            monto = input()
+            if monto=='0':
+                self.cambiar_estado(self.ESTADO_MENU_PRINCIPAL)
+                return
+            try:
+                valor_monto = int(monto)
+                if valor_monto<0:
+                    raise Exception('')
+                break
+            except:
+                self.mostrar_error('Debe ingresar un numero mayor que cero')
+        if valor_monto>0:
+            resp = self.controlador.retiro(self.numero_cuenta,valor_monto)
+            if resp.ok():
+                print(resp.datos)
+            else:
+                self.mostrar_error(resp.error)
+        print('')
+        print('(1) para regresar al menu, (2) para salir')
+        val = input()
+        if val=='2':
+            self.salir_del_programa()
+        else:
+            self.cambiar_estado(self.ESTADO_MENU_PRINCIPAL)
+
+    def abono(self):
+        self.mostrar_encabezado_principal('Abono')
+        valor_monto = 0
+        while True:
+            print('Ingrese monto a abonar (0 para regresar)')
+            monto = input()
+            if monto=='0':
+                self.cambiar_estado(self.ESTADO_MENU_PRINCIPAL)
+                return
+            try:
+                valor_monto = int(monto)
+                if valor_monto<0:
+                    raise Exception('')
+                break
+            except:
+                self.mostrar_error('Debe ingresar un numero mayor que cero')
+        if valor_monto>0:
+            resp = self.controlador.abono(self.numero_cuenta,valor_monto)
+            if resp.ok():
+                print(resp.datos)
+            else:
+                self.mostrar_error(resp.error)
+        print('')
+        print('(1) para regresar al menu, (2) para salir')
+        val = input()
+        if val=='2':
+            self.salir_del_programa()
+        else:
+            self.cambiar_estado(self.ESTADO_MENU_PRINCIPAL)
 
     def inicio(self):
         self.mostrar_encabezado_principal('Inicio')
@@ -40,20 +121,29 @@ class AplicacionConsola:
             elif nro_cuenta<0:
                 self.mostrar_error('El numero de cuenta debe ser mayor de 0')
                 continue
-            #TODO
-            ok = True
+            print('Ahora ingrese la clave')
+            clave = input()
+            try:
+                resp = self.controlador.consulta_cliente(nro_cuenta,clave)
+            except:
+                self.mostrar_error_conexion()
+                continue
+            ok = resp.ok()
             if ok:
                 self.numero_cuenta = nro_cuenta
+                self.nombre_cliente = resp.datos.get('nombre')
                 self.cambiar_estado(self.ESTADO_MENU_PRINCIPAL)
                 break
             else:
-                self.mostrar_error('La cuenta no existe')
+                self.mostrar_error(resp.error)
                 continue
 
     def menu_principal(self):
-        self.mostrar_encabezado_principal('Menu Principal Cuenta %i'%self.numero_cuenta)
+        self.mostrar_encabezado_principal('Bienvenido(a) %s'%self.nombre_cliente)
         estados = [
             ['Consultar', self.ESTADO_CONSULTA],
+            ['Hacer retiro',self.ESTADO_RETIRO],
+            ['Hacer abono',self.ESTADO_ABONO],
             ['Ingresar otra cuenta',self.ESTADO_INICIO]
         ]
         textos = [x[0] for x in estados]
@@ -65,8 +155,10 @@ class AplicacionConsola:
         self.cambiar_estado(estado)
 
     def mostrar_encabezado_principal(self, nombresubmenu):
-        print(' NOMBRE '.center(80,'='))
+        print('')
+        print(' BANCO XYZ '.center(80,'='))
         print((' '+nombresubmenu+' ').center(80,'-'))
+        print('')
 
     def salir_del_programa(self):
         print(' FIN DEL PROGRAMA '.center(80,'='))
@@ -90,6 +182,9 @@ class AplicacionConsola:
     
     def mostrar_error(self,mensaje):
         print('[ '+((' '+mensaje+' ').center(76,'*'))+' ]')
+    
+    def mostrar_error_conexion(self):
+        self.mostrar_error('No se pudo establecer conexion con el servidor. Intentelo mas tarde')
 
 
 if __name__=='__main__':
