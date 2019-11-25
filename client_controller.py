@@ -13,19 +13,16 @@ class ControladorCliente:
     def retiro(self,cuenta,valor):
         pet = peticion.Peticion('retiro',{'cuenta':cuenta,'valor':valor})
         resp = self.cliente.enviar_peticion(pet)
-        #log.info('Retiro cuenta: %s, valor: %s, respuesta: %s'%(cuenta,valor,resp.__dict__))
         return resp
 
     def abono(self,cuenta,valor):
         pet = peticion.Peticion('abono',{'cuenta':cuenta,'valor':valor})
         resp = self.cliente.enviar_peticion(pet)
-        #log.info('Retiro cuenta: %s, valor: %s, respuesta: %s'%(cuenta,valor,resp.__dict__))
         return resp
 
     def consulta(self,cuenta):
         pet = peticion.Peticion('consulta',{'cuenta':cuenta})
         resp = self.cliente.enviar_peticion(pet)
-        #log.info('Retiro cuenta: %s, respuesta: %s'%(cuenta,resp.__dict__))
         return resp
 
 
