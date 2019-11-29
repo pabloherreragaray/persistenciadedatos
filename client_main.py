@@ -1,5 +1,6 @@
 import sys
 import client_controller
+from client_main_gui import AplicacionGUI
 
 class AplicacionConsola:
     ESTADO_SALIR_DEL_PROGRAMA = 'salir'
@@ -187,5 +188,17 @@ class AplicacionConsola:
         self.mostrar_error('No se pudo establecer conexion con el servidor. Intentelo mas tarde')
 
 
-if __name__=='__main__':
+def consola():
     AplicacionConsola()
+
+
+def gui():
+    app = AplicacionGUI()
+    app.iniciar()
+
+
+if __name__=='__main__':
+    if len(sys.argv)>1 and sys.argv[0]=='consola':
+        consola()
+    else:
+        gui()
