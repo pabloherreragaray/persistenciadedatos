@@ -4,6 +4,7 @@ import json
 class Respuesta:
     datos = None
     error = None
+    iporigen = None
 
     def set_datos(self,datos):
         self.datos = datos
